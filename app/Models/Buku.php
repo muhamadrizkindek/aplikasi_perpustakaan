@@ -24,5 +24,8 @@ class Buku extends Model
         return $this->belongsTo(Kategori::class,'kategori_id');
     }
 
-    
+    public function peminjam(){
+        return $this->hasMany(Buku::class,);
+    }
+
 }

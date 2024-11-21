@@ -17,57 +17,53 @@ class AuthController extends Controller
     // Validasi data
     $request->validate([
         'nama'             => 'required|max:225',
-        'kelas'            => 'required|max:50', 
-        'jurusan'          => 'required|max:100', 
+        'kelas'            => 'required|max:50',
+        'jurusan'          => 'required|max:100',
         'tanggal_bergabung'=> 'required|date',
         'email'            => 'required|email|unique:users,email', // Validasi email agar unik
-        'nomor_telepon'    => 'required|numeric|min:10', 
-        'password'         => 'required|min:8',
-        'role'             => 'required|in:admin,siswa,teacher', 
+        'nomor_telepon'    => 'required|numeric|digits_between:10,15', // Validasi nomor telepon
+        'password'         => 'required|min:8', // Konfirmasi password
+        'role'             => 'required|in:admin,user',
     ], [
-        'nama.required'        => 'Nama Harus Di isi',
-        'nama.max'             => 'Nama Maksimal 225 karakter',
-        'kelas.required'       => 'Kelas Harus Di isi',
-        'kelas.max'            => 'Kelas Maksimal 50 karakter',
-        'jurusan.required'     => 'Jurusan Harus Di isi',
-        'jurusan.max'                    => 'Jurusan Maksimal 100 karakter',
-        'tanggal_bergabung.required'     => 'Tanggal Bergabung Harus Di isi',
-        'tanggal_bergabung.date'         => 'Tanggal Bergabung Harus Berformat Tanggal yang valid',
-        'email.required'                 => 'Email Harus Di isi',
-        'email.email'                    => 'Email Harus Berformat Valid',
-        'email.unique'                   => 'Email sudah ada',
-        'nomer_telepon.required'         => 'Nomor Telepon Harus Di isi',
-        'nomer_telepon.numeric'          => 'Nomor Telepon Harus Berupa Angka',
-        'nomer_telepon.min'              => 'Nomor Telepon Harus Memiliki Setidaknya 10 Digit',
-        'password.required'              => 'Password Harus Di isi',
-        'password.min'                   => 'Password minimal 8 karakter',
-        'role.required'                  => 'Role Harus Di pilih',
-        'role.in'                        => 'Role tidak valid',
+        'nama.required'        => 'Nama harus diisi.',
+        'nama.max'             => 'Nama maksimal 225 karakter.',
+        'kelas.required'       => 'Kelas harus diisi.',
+        'kelas.max'            => 'Kelas maksimal 50 karakter.',
+        'jurusan.required'     => 'Jurusan harus diisi.',
+        'jurusan.max'          => 'Jurusan maksimal 100 karakter.',
+        'tanggal_bergabung.required' => 'Tanggal bergabung harus diisi.',
+        'tanggal_bergabung.date'     => 'Tanggal bergabung harus berupa tanggal yang valid.',
+        'email.required'       => 'Email harus diisi.',
+        'email.email'          => 'Email harus berformat valid.',
+        'email.unique'         => 'Email sudah terdaftar.',
+        'nomor_telepon.required' => 'Nomor telepon harus diisi.',
+        'nomor_telepon.numeric'  => 'Nomor telepon harus berupa angka.',
+        'nomor_telepon.digits_between' => 'Nomor telepon harus memiliki 10-15 digit.',
+        'password.required'    => 'Password harus diisi.',
+        'password.min'         => 'Password minimal 8 karakter.',
+        'password.confirmed'   => 'Konfirmasi password tidak cocok.',
+        'role.required'        => 'Role harus dipilih.',
+        'role.in'              => 'Role tidak valid.',
     ]);
 
-    // Cek apakah email sudah ada di database
-    if (User::where('email', $request->email)->exists()) {
-        return back()->withErrors(['email' => 'Email sudah terdaftar']);
-    }
+    // Simpan data ke database
+    $user = User::create([
+        'nama'             => $request->nama,
+        'kelas'            => $request->kelas,
+        'jurusan'          => $request->jurusan,
+        'tanggal_bergabung'=> $request->tanggal_bergabung,
+        'email'            => $request->email,
+        'nomor_telepon'    => $request->nomor_telepon,
+        'password'         => bcrypt($request->password), // Enkripsi password
+        'role'             => $request->role,
+    ]);
 
-    // Menyimpan data ke dalam database
-    $storeDataSiswa = [
-        'nama'              => $request->nama,
-        'kelas'             => $request->kelas,
-        'jurusan'           => $request->jurusan,
-        'tanggal_bergabung' => $request->tanggal_bergabung,
-        'email'             => $request->email,
-        'nomor_telepon'     => $request->nomor_telepon,
-        'password'          => bcrypt($request->password), // Enkripsi password
-        'role'              => $request->role,
-    ];
-
-    // Masukkan data ke dalam model atau query builder untuk menyimpan ke database
-    User::create($storeDataSiswa);
-
-    // Redirect atau tampilkan view setelah berhasil
-    return redirect('/login')->with('success', 'Registrasi berhasil, silakan login.');
+    // Redirect dengan pesan sukses
+    return redirect('/login')->with('success', 'Registrasi berhasil. Silakan login.');
 }
+
+
+
 
     //Login
 
@@ -83,10 +79,10 @@ class AuthController extends Controller
 
         if (auth()->attempt($credentials)){
             if (Auth::user()->role == 'user'){
-                return redirect('dasboard');
+                return redirect('/');
             }
             if (Auth::user()->role == 'admin'){
-                return redirect('dasboard');
+                return redirect('/');
             }
         }else{
             return redirect('/login')->with('error','password salah');

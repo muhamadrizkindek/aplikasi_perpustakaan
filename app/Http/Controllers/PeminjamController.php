@@ -10,55 +10,87 @@ use Illuminate\Support\Facades\Auth;
 
 class PeminjamController extends Controller
 {
-    public function index(){
-        return view('pages.dasboard.index');
+    public function index()
+    {
+        $peminjamans = Peminjam::with(['user', 'buku'])->get(); // Memuat relasi user dan buku
+        return view('pages.peminjam.peminjaman', compact('peminjamans'));
     }
 
-    public function create(){
-        $kategoris = Kategori::all();
-        $bukus = Buku::all();
-        return view('pagesUser.peminjaman.tambah', compact('kategoris', 'bukus'));
+
+
+    public function create()
+    {
+        $bukus = Buku::all(); // Mengambil data barang
+        return view('pages.peminjam.tambah', compact('bukus'));
     }
 
-    public function storePeminjam(Request $request){
-        // Validasi input
-        dd($request->all());
+    public function store(Request $request)
+    {
         $request->validate([
-            'user_id'              => 'required',
-            'kelas'                => 'required',
-            'buku_id'              => 'required',
-            'kategori_id'          => 'required',
-            'jumlah_peminjaman'    => 'required|numeric',
-            'tanggal_peminjaman'   => 'required|date',
-            'tanggal_pengembalian' => 'required|date'
-        ], [
-            'kelas.required'                => 'Kelas Harus Di isi',
-            'buku_id.required'              => 'Buku Harus Di isi',
-            'kategori_id.required'          => 'Kategori Harus Di isi',
-            'jumlah_peminjaman.required'    => 'Jumlah pinjaman Harus di isi',
-            'tanggal_peminjaman.required'   => 'Tanggal Peminjaman Harus di isi',
-            'tanggal_pengembalian.required' => 'Tanggal Pengembalian Harus di isi'
+            'kelas' => 'required|string|max:255',
+            'buku_id' => 'required',
+            'jumlah_peminjaman' => 'required|integer|min:1',
+            'tanggal_peminjaman' => 'required|date',
+            'tanggal_pengembalian' => 'required|date|after_or_equal:tanggal_peminjaman',
         ]);
 
-        // Simpan data ke tabel peminjam
         Peminjam::create([
-            'user_id'                => Auth::user()->id,  // Mendapatkan ID pengguna yang sedang login
-            'kelas'                  => $request->kelas,
-            'buku_id'                => $request->buku_id,
-            'kategori_id'            => $request->kategori_id,
-            'jumlah_peminjaman'      => $request->jumlah_peminjaman,
-            'tanggal_peminjaman'     => $request->tanggal_peminjaman,
-            'tanggal_pengembalian'   => $request->tanggal_pengembalian,
-            'status'                 => 'belum_dikembalikan'  // Status peminjaman default
+            'user_id' => auth()->id(), // Mendapatkan ID pengguna yang sedang login
+            'kelas' => $request->kelas,
+            'buku_id' => $request->buku_id,
+            'jumlah_peminjaman' => $request->jumlah_peminjaman,
+            'tanggal_peminjaman' => $request->tanggal_peminjaman,
+            'tanggal_pengembalian' => $request->tanggal_pengembalian,
+            'status' => 'belum_dikembalikan', // Default status
         ]);
 
-        // Redirect setelah menyimpan data
-        return redirect('/peminjamanku')->with('success', 'Peminjaman berhasil ditambahkan!');
+        return redirect('/anggota')->with('success', 'Peminjaman berhasil ditambahkan!');
     }
 
-    // Daftar peminjaman yang sudah dilakukan
-    public function peminjamanku(Request $request){
-        $peminjams = Peminjam::where('user_id', Auth::id())->get(); // Filter berdasarkan user yang sedang login
-        return view('pagesUser.peminjaman.peminjamanku', compact('peminjams'));
+
+    public function edit($id)
+    {
+        $peminjaman = Peminjam::findOrFail($id); // Temukan peminjaman berdasarkan ID
+        $bukus = Buku::all(); // Ambil semua data buku untuk dropdown
+        return view('pages.peminjam.editpinjaman', compact('peminjaman', 'bukus'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'kelas' => 'required|string|max:255',
+            'buku_id' => 'required',
+            'jumlah_peminjaman' => 'required|integer|min:1',
+            'tanggal_peminjaman' => 'required|date',
+            'tanggal_pengembalian' => 'required|date|after_or_equal:tanggal_peminjaman',
+        ]);
+
+        $peminjaman = Peminjam::findOrFail($id);
+        $peminjaman->update([
+            'kelas' => $request->kelas,
+            'buku_id' => $request->buku_id,
+            'jumlah_peminjaman' => $request->jumlah_peminjaman,
+            'tanggal_peminjaman' => $request->tanggal_peminjaman,
+            'tanggal_pengembalian' => $request->tanggal_pengembalian,
+            'status' => $request->status ?? 'belum_dikembalikan', // Status dapat diubah jika diperlukan
+        ]);
+
+        return redirect('/anggota')->with('success', 'Peminjaman berhasil diperbarui!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        $peminjam = Peminjam::findOrFail($id);
+        $peminjam->delete();
+
+        return redirect('/anggota')->with('success', 'Peminjaman berhasil dihapus!');
     }
 }
+
+
