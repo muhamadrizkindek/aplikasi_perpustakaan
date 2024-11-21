@@ -22,26 +22,17 @@
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <h4 class="text-center mb-4">Sign in your account</h4>
-                                    <form action="index.html">
+                                    <form action="/store/login" method="post">
+                                        @csrf
                                         <div class="form-group">
                                             <label><strong>Email</strong></label>
-                                            <input type="email" class="form-control" value="hello@example.com">
+                                            <input name="email" type="email" class="form-control" >
                                         </div>
                                         <div class="form-group">
                                             <label><strong>Password</strong></label>
-                                            <input type="password" class="form-control" value="Password">
+                                            <input name="password" type="password" class="form-control" >
                                         </div>
-                                        <div class="form-row d-flex justify-content-between mt-4 mb-2">
-                                            <div class="form-group">
-                                                <div class="form-check ml-2">
-                                                    <input class="form-check-input" type="checkbox" id="basic_checkbox_1">
-                                                    <label class="form-check-label" for="basic_checkbox_1">Remember me</label>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <a href="page-forgot-password.html">Forgot Password?</a>
-                                            </div>
-                                        </div>
+
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-primary btn-block">Sign me in</button>
                                         </div>

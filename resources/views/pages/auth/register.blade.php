@@ -21,7 +21,7 @@
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <h4 class="text-center mb-4">Sign up your account</h4>
-                                    <form action="{{ route('register') }}" method="POST">
+                                    <form action="/store/register" method="POST">
                                         @csrf
                                         <!-- Name -->
                                         <div class="form-group">
@@ -90,8 +90,8 @@
                                         <div class="form-group">
                                             <label><strong>Role</strong></label>
                                             <select name="role" class="form-control @error('role') is-invalid @enderror">
+                                                <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>user</option>
                                                 <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                                <option value="siswa" {{ old('role') == 'aggota' ? 'selected' : '' }}>anggota</option>
                                             </select>
                                             @error('role')
                                                 <span class="invalid-feedback">{{ $message }}</span>

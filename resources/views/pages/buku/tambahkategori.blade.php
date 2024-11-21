@@ -4,7 +4,8 @@
     <div class="card-header">
         <h4 class="card-title">Tambah kategori</h4>
     </div>
-    <div class="card-body">
+    <div class="col-lg">
+    <div class="card w-200">
         <div class="basic-form">
             <form action="/store/kategori" method="POST">
                 @csrf
@@ -27,6 +28,7 @@
                 </div>
             </form>
         </div>
+    </div>
     </div>
 </div>
 

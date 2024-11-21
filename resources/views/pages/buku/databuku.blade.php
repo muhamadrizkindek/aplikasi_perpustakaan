@@ -22,7 +22,9 @@
                                                 <th>Penerbit</th>
                                                 <th>Tahun terbit</th>
                                                 <th>Jumlah tersedia</th>
+                                                @if (Auth::user()->role == 'admin')
                                                 <th>aksi</th>
+                                                @endif
                                             </tr>
                                         </thead>
                                         <tbody class="text-dark">
@@ -36,13 +38,15 @@
                                                 <td>{{ $buku->penerbit }}</td>
                                                 <td>{{ $buku->tahun_terbit }}</td>
                                                 <td>{{ $buku->jumlah_tersedia }}</td>
+                                                @if (Auth::user()->role == 'admin')
                                                 <td>
-                                                    <a href="/editbuku/{{ $buku->id }}" 
+                                                    <a href="/editbuku/{{ $buku->id }}"
                                                     class="btn btn-primary">Edit</a>
                                                     <a onClick="return confirm('apakah anda yakin ingin menghapus data tersebut?')"
-                                                       href="/destroybuku/{{ $buku->id }}" 
+                                                       href="/destroybuku/{{ $buku->id }}"
                                                        class="btn btn-danger">hapus</a>
                                                 </td>
+                                                @endif
                                             </tr>
                                         </div>
                                       </div>

@@ -18,8 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('kelas');
             $table->unsignedBigInteger('buku_id');
-            $table->unsignedBigInteger('kategori_id');
-            $table->bigInteger('jumlah_peminjaman');
+            $table->string('jumlah_peminjaman');
             $table->date('tanggal_peminjaman');
             $table->date('tanggal_pengembalian');
             $table->enum('status',['sudah_dikembalikan','belum_dikembalikan']);
